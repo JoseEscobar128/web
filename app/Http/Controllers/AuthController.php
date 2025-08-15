@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function redirectToProvider(Request $request)
 
     {
-        dd(config('services.oauth.client_id'));
+        
         $request->session()->put('state', $state = Str::random(40));
         
 
