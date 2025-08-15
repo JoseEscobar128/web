@@ -12,8 +12,11 @@ class AuthController extends Controller
      * Redirige al usuario a la API para que inicie el proceso de autorización.
      */
     public function redirectToProvider(Request $request)
+
     {
+        dd(config('services.oauth.client_id'));
         $request->session()->put('state', $state = Str::random(40));
+        
 
         $query = http_build_query([
             'client_id'     => config('services.oauth.client_id'),
