@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scrollbar general */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* Track (fondo del scroll) */
+::-webkit-scrollbar-track {
+    background: #f3f4f6; /* fondo claro, cambia según tu diseño */
+    border-radius: 10px;
+}
+
+/* Scrollbar (parte que se arrastra) */
+::-webkit-scrollbar-thumb {
+    background-color: #d4a21a; /* mostaza o tu color principal */
+    border-radius: 10px;
+    border: 2px solid #f3f4f6; /* mismo color del track */
+}
+
+/* Scrollbar al pasar el mouse */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #c08915; /* tono más oscuro */
+}
