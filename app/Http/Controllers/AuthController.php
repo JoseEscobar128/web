@@ -4,130 +4,130 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log; // Asegúrate de que esté importado
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    // Valor fijo del state
+    private $fixedState = 'web_state_fijo';
+
     /**
-     * Redirige al usuario a la API para que inicie el proceso de autorización.
+     * Redirige al proveedor OAuth
      */
     public function redirectToProvider(Request $request)
     {
-        $request->session()->put('state', $state = Str::random(40));
+        $state = $this->fixedState;
 
-        $query = http_build_query([
-            'client_id'     => config('services.oauth.client_id'),
-            'redirect_uri'  => config('services.oauth.redirect_uri'),
-            'response_type' => 'code',
-            'state'         => $state,
+        Log::debug('Inicio flujo OAuth', [
+            'generated_state' => $state,
+            'session_id' => session()->getId(),
+            'session_data' => $request->session()->all()
         ]);
 
-        return redirect(config('services.auth_api.base_url') . '/oauth/authorize?' . $query);
+        $query = http_build_query([
+            'client_id' => config('services.oauth.client_id'),
+            'redirect_uri' => config('services.oauth.redirect_uri'),
+            'response_type' => 'code',
+            'state' => $state,
+            'prompt' => 'login'
+        ]);
+
+        return redirect(config('services.auth_api.base_url').'/oauth/authorize?'.$query);
     }
 
     /**
-     * Recibe al usuario de vuelta desde la API y canjea el código por un token.
+     * Maneja el callback del proveedor OAuth
      */
     public function handleCallback(Request $request)
     {
-        // LOG: Inicio del proceso de callback
-        Log::info('[OAuth Callback] Se ha recibido la redirección desde la API.', ['query' => $request->all()]);
-
-        $state = $request->session()->pull('state');
-        if (! (strlen($state) > 0 && $state === $request->state)) {
-            // LOG: Error de estado
-            Log::error('[OAuth Callback] El estado (state) no es válido o no coincide.', [
-                'session_state' => $state,
-                'request_state' => $request->state
-            ]);
-            return redirect('/')->with('error', 'Estado inválido.');
-        }
-
-        // LOG: El estado es válido
-        Log::info('[OAuth Callback] El estado (state) es válido. Procediendo a solicitar el token de acceso.');
-
-        $tokenEndpoint = config('services.auth_api.base_url') . '/oauth2/token';
-        
-        $payload = [
-            'grant_type'    => 'authorization_code',
-            'client_id'     => config('services.oauth.client_id'),
-            'client_secret' => config('services.oauth.client_secret'),
-            'redirect_uri'  => config('services.oauth.redirect_uri'),
-            'code'          => $request->code,
-        ];
-
-        // LOG: Detalles de la petición para obtener el token (sin el secreto)
-        Log::info('[OAuth Callback] Enviando petición POST a: ' . $tokenEndpoint, [
-            'payload' => collect($payload)->except('client_secret')->all()
+        Log::debug('Inicio callback OAuth', [
+            'received_state' => $request->state,
+            'session_id' => session()->getId(),
+            'session_data' => $request->session()->all()
         ]);
 
+        // Validar state fijo
+        if ($request->state !== $this->fixedState) {
+            Log::error('Error de estado: No coincide con state fijo', [
+                'received_state' => $request->state
+            ]);
+            return redirect('/')->with('error', 'Estado inválido. Intente nuevamente.');
+        }
+
+        // Intercambiar código por token
         $tokenResponse = Http::withoutVerifying()
-                             ->asForm()
-                             ->post($tokenEndpoint, $payload);
+            ->asForm()
+            ->post(config('services.auth_api.base_url').'/oauth2/token', [
+                'grant_type' => 'authorization_code',
+                'client_id' => config('services.oauth.client_id'),
+                'client_secret' => config('services.oauth.client_secret'),
+                'redirect_uri' => config('services.oauth.redirect_uri'),
+                'code' => $request->code,
+            ]);
 
         if ($tokenResponse->failed()) {
-            // LOG: La petición del token falló
-            Log::error('[OAuth Callback] La petición para obtener el token de acceso falló.', [
+            Log::error('Error al obtener token', [
                 'status' => $tokenResponse->status(),
-                'body' => $tokenResponse->body()
+                'response' => $tokenResponse->body()
             ]);
-            return redirect('/')->with('error', 'No se pudo obtener el token de acceso desde la API.');
+            return redirect('/')->with('error', 'Error al autenticar. Intente nuevamente.');
         }
-        
-        // LOG: La petición del token fue exitosa
-        Log::info('[OAuth Callback] Token de acceso obtenido correctamente.');
 
         $tokenData = $tokenResponse->json();
         $accessToken = $tokenData['access_token'];
 
-        $profileEndpoint = config('services.auth_api.base_url') . '/usuarios/me';
-        
-        // LOG: Solicitando perfil del usuario
-        Log::info('[OAuth Callback] Solicitando perfil del usuario desde: ' . $profileEndpoint);
-
+        // Obtener información del usuario
         $userResponse = Http::withToken($accessToken)
-                            ->acceptJson()
-                            ->get($profileEndpoint);
+            ->acceptJson()
+            ->get(config('services.auth_api.base_url').'/usuarios/me');
 
         if ($userResponse->failed()) {
-            // LOG: La petición del perfil falló
-            Log::error('[OAuth Callback] La petición para obtener el perfil del usuario falló.', [
+            Log::error('Error al obtener perfil', [
                 'status' => $userResponse->status(),
-                'body' => $userResponse->body()
+                'response' => $userResponse->body()
             ]);
-            return redirect('/')->with('error', 'No se pudieron obtener los datos del perfil desde la API.');
+            return redirect('/')->with('error', 'Error al cargar su perfil.');
         }
 
-        // LOG: El perfil del usuario se obtuvo correctamente
         $userData = $userResponse->json()['data'];
-        Log::info('[OAuth Callback] Perfil de usuario obtenido.', ['usuario' => $userData['usuario'] ?? null]);
 
+        // Regenerar ID de sesión por seguridad
         $request->session()->regenerate();
 
-        session([
+        // Guardar datos de usuario en sesión
+        $request->session()->put([
             'access_token' => $accessToken,
-            'user'         => (object) $userData
+            'user' => (object) $userData
         ]);
 
-        // LOG: Sesión creada, redirigiendo al dashboard
-        Log::info('[OAuth Callback] Sesión creada. Redirigiendo al dashboard.');
+        Log::info('Autenticación exitosa', [
+            'user_id' => $userData['id'] ?? null,
+            'session_id' => session()->getId()
+        ]);
 
-        return redirect()->intended('/web/web/dashboard');
+        return redirect()->intended('/dashboard');
     }
 
     /**
-     * Cierra la sesión del usuario.
+     * Cierra la sesión del usuario
      */
     public function logout(Request $request)
     {
         $token = $request->session()->get('access_token');
-        
-        $logoutEndpoint = config('services.auth_api.base_url') . '/usuarios/logout';
-        Http::withToken($token)->post($logoutEndpoint);
 
+        try {
+            Http::withToken($token)
+                ->post(config('services.auth_api.base_url').'/usuarios/logout');
+        } catch (\Exception $e) {
+            Log::error('Error al cerrar sesión en API', [
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        // Limpiar sesión local
         $request->session()->flush();
+        $request->session()->regenerate();
 
-        return redirect()->route('home')->with('success', 'Has cerrado sesión correctamente.');
+        return redirect('/')->with('success', 'Ha cerrado sesión correctamente.');
     }
 }

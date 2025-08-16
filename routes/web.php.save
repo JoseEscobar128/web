@@ -26,10 +26,14 @@ use App\Livewire\Admin\Branches\Edit as BranchEdit;
 use App\Livewire\ProfilePage;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('web')->group(function () {
-    
-     // Rutas para visitantes (sin sesión)
+Route::get('/login', [AuthController::class, 'redirectToProvider'])->name('login');
+Route::get('/callback/web', [AuthController::class, 'handleCallback'])->name('oauth.callback.web');
+
+Route::prefix('web')->middleware('web')->group(function () {
+
+    // Rutas para visitantes (sin sesión)
     Route::middleware('guest')->group(function() {
+
         Route::get('/', function () {
             if (auth()->check()) {
                 return redirect()->route('dashboard');
@@ -37,41 +41,43 @@ Route::middleware('web')->group(function () {
             return view('auth.login');
         })->name('home');
 
-        Route::get('/login', [AuthController::class, 'redirectToProvider'])->name('login');
-       Route::get('/callback', [AuthController::class, 'handleCallback']);
-  
+        //Route::get('/login', [AuthController::class, 'redirectToProvider'])->name('login');
+        //Route::get('/callback/web', [AuthController::class, 'handleCallback'])->name('oauth.callback.web');
 
- });
+    });
 
-
-    // Grupo de rutas protegidas que requieren un token de sesión
+    // Rutas protegidas que requieren token de sesión
     Route::middleware('auth.token')->group(function () {
-        
-        // Rutas del Dashboard
+
+        // Dashboard
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-        // CRUDs
+        // CRUD Usuarios
         Route::get('/usuarios', UserIndex::class)->name('admin.users.index');
         Route::get('/usuarios/create', UserCreate::class)->name('admin.users.create');
         Route::get('/usuarios/{id}/edit', UserEdit::class)->name('admin.users.edit');
 
+        // CRUD Empleados
         Route::get('/empleados', EmployeeIndex::class)->name('admin.employees.index');
         Route::get('/empleados/create', EmployeeCreate::class)->name('admin.employees.create');
         Route::get('/empleados/{id}/edit', EmployeeEdit::class)->name('admin.employees.edit');
 
+        // CRUD Productos
         Route::get('/productos', ProductIndex::class)->name('admin.products.index');
         Route::get('/productos/create', ProductCreate::class)->name('admin.products.create');
         Route::get('/productos/{id}/edit', ProductEdit::class)->name('admin.products.edit');
 
+        // CRUD Categorías
         Route::get('/categorias', CategoryIndex::class)->name('admin.categories.index');
         Route::get('/categorias/create', CategoryCreate::class)->name('admin.categories.create');
         Route::get('/categorias/{id}/edit', CategoryEdit::class)->name('admin.categories.edit');
-        
+
+        // CRUD Sucursales
         Route::get('/sucursales', BranchIndex::class)->name('admin.branches.index');
         Route::get('/sucursales/create', BranchCreate::class)->name('admin.branches.create');
         Route::get('/sucursales/{id}/edit', BranchEdit::class)->name('admin.branches.edit');
 
-        // Rutas Operativas
+        // Rutas operativas
         Route::get('/ordenes', OrderIndex::class)->name('admin.orders.index');
         Route::get('/ordenes/{id}', OrderShow::class)->name('admin.orders.show');
         Route::get('/pos', PointOfSale::class)->name('admin.pos.index');
@@ -82,8 +88,11 @@ Route::middleware('web')->group(function () {
         // Perfil y Logout
         Route::get('/profile', ProfilePage::class)->name('profile');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
     });
+
 });
+
 
 Route::get('/preview/design', function () {
     return view('preview-design');
