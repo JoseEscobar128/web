@@ -9,4 +9,9 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        https: true,  // 👈 Forzar que los assets se sirvan por https
+        host: '0.0.0.0',
+        port: 5173,
+    },
 });

@@ -157,4 +157,14 @@ return [
     */
 
     'pagination_theme' => 'tailwind',
+	
+
+    /*
+    |--------------------------------------------------------------------------
+    | Asset URL
+    |--------------------------------------------------------------------------
+    | Define la URL base desde donde se deben cargar los assets de Livewire.
+    */
+    'asset_url' => env('ASSET_URL', env('APP_URL') . '/web'),
+
 ];
