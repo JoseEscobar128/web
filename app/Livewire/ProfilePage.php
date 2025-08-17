@@ -50,26 +50,19 @@ class ProfilePage extends Component
             return redirect()->route('home')->with('error', 'Tu sesión ha expirado.');
         }
 
-        
-        // Consumir la API para obtener los datos del usuario autenticado
         $response = Http::authApi()->get('/usuarios/me');
-
-        // Debug para ver qué responde la API
-        dd([
-            'status' => $response->status(),
-            'body'   => $response->json(),
-        ]);
 
         if ($response->failed()) {
             return redirect()->route('home')->with('error', 'No se pudo obtener la información del usuario.');
         }
 
+        // 👇 aquí extraes el objeto de usuario
         $userData = $response->json('data');
 
         // Guardar en propiedades
-        $this->userId = $userData['id'];
+        $this->userId  = $userData['id'];
         $this->usuario = $userData['usuario'];
-        $this->email = $userData['email'];
+        $this->email   = $userData['email'];
 
         // También actualizar la sesión si quieres usarla en otras partes
         session(['user' => (object) $userData]);
