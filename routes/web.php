@@ -89,3 +89,7 @@ Route::get('/preview/design', function () {
     return view('preview-design');
 })->name('preview.design');
 
+Route::get('/debug-url', function () {
+    echo "URL generada por url('/'): " . url('/') . "<br>";
+    echo "URL generada por asset('js/app.js'): " . asset('js/app.js');
+});
