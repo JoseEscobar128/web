@@ -1,5 +1,13 @@
 <?php
 
+// --- INICIO DEL ARREGLO DEFINITIVO PARA CLOUDFLARE ---
+// Forzamos a PHP a creer que la conexión es HTTPS desde el primer momento.
+// Esto anula cualquier configuración incorrecta que venga de Nginx.
+$_SERVER['HTTPS'] = 'on';
+$_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+// --- FIN DEL ARREGLO ---
+
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

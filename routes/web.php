@@ -45,7 +45,7 @@ Route::middleware('web')->group(function () {
 
 
     // Grupo de rutas protegidas que requieren un token de sesión
-    Route::middleware('auth.token')->group(function () {
+    Route::middleware('auth')->group(function () {
         
         // Rutas del Dashboard
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
@@ -166,4 +166,8 @@ Route::get('/diagnostico-completo', function () {
     } else {
         echo '<p><strong>Advertencia:</strong> El archivo <code>config/livewire.php</code> no parece estar publicado o cargado. Livewire podría estar usando valores por defecto.</p>';
     }
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> f80b12328cc23f0aad85e2e1c82aa3f187581425
