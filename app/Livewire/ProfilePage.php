@@ -46,20 +46,28 @@ class ProfilePage extends Component
 
     public function mount()
     {
-        if (!session()->has('access_token') || !session()->has('user')) {
+        if (!session()->has('access_token')) {
             return redirect()->route('home')->with('error', 'Tu sesión ha expirado.');
         }
 
-        $userFromSession = session('user');
-        
-        if (!isset($userFromSession->id)) {
-            return redirect()->route('home')->with('error', 'Los datos de tu sesión son inválidos.');
+        // Consumir la API para obtener los datos del usuario autenticado
+        $response = Http::authApi()->get('/me');
+
+        if ($response->failed()) {
+            return redirect()->route('home')->with('error', 'No se pudo obtener la información del usuario.');
         }
 
-        $this->userId = $userFromSession->id;
-        $this->usuario = $userFromSession->usuario ?? '';
-        $this->email = $userFromSession->email ?? '';
+        $userData = $response->json('data');
+
+        // Guardar en propiedades
+        $this->userId = $userData['id'];
+        $this->usuario = $userData['usuario'];
+        $this->email = $userData['email'];
+
+        // También actualizar la sesión si quieres usarla en otras partes
+        session(['user' => (object) $userData]);
     }
+
 
     /**
      * Valida en tiempo real cuando una propiedad cambia.
