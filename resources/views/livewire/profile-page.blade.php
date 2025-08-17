@@ -12,12 +12,6 @@
                     $userRole = session('user')->rol ?? null;
                 @endphp
 
-                {{-- Dump para depurar --}}
-                <div class="mb-6 p-4 bg-gray-100 border rounded">
-                    <h2 class="font-bold mb-2">Debug info</h2>
-                    @dump($usuario, $email)
-                </div>
-
                 <!-- Tarjeta para actualizar información del perfil -->
                 <div class="bg-black/50 backdrop-blur-sm p-6 rounded-[20px] shadow-lg">
                     <header>
@@ -28,14 +22,14 @@
                     <form wire:submit.prevent="updateProfileInformation" class="mt-6 space-y-4">
                         <div>
                             <label for="usuario" class="block font-semibold text-white mb-1">Usuario</label>
-                            <input wire:model="usuario" id="usuario" type="text" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('usuario') ring-2 ring-red-500 @enderror" required autofocus>
+                            <input wire:model.live="usuario" id="usuario" type="text" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('usuario') ring-2 ring-red-500 @enderror" required autofocus>
                             @error('usuario') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         @if(in_array($userRole, ['SUPERADMIN', 'ADMIN_SUC']))
                             <div>
                                 <label for="email" class="block font-semibold text-white mb-1">Email</label>
-                                <input wire:model="email" id="email" type="email" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('email') ring-2 ring-red-500 @enderror" required>
+                                <input wire:model.live="email" id="email" type="email" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('email') ring-2 ring-red-500 @enderror" required>
                                 @error('email') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -57,12 +51,12 @@
                         <form wire:submit.prevent="updatePassword" class="mt-6 space-y-4">
                             <div>
                                 <label for="password" class="block font-semibold text-white mb-1">Nueva Contraseña</label>
-                                <input wire:model="password" id="password" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
+                                <input wire:model.live="password" id="password" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
                                 @error('password') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label for="password_confirmation" class="block font-semibold text-white mb-1">Confirmar Contraseña</label>
-                                <input wire:model="password_confirmation" id="password_confirmation" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
+                                <input wire:model.live="password_confirmation" id="password_confirmation" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
                             </div>
                             <div class="flex items-center gap-4 pt-2">
                                 <button type="submit" class="bg-terracota text-white font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors">
