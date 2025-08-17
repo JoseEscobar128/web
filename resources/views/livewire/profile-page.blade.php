@@ -22,14 +22,14 @@
                     <form wire:submit.prevent="updateProfileInformation" class="mt-6 space-y-4">
                         <div>
                             <label for="usuario" class="block font-semibold text-white mb-1">Usuario</label>
-                            <input wire:model.live="usuario" id="usuario" type="text" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('usuario') ring-2 ring-red-500 @enderror" required autofocus>
+                            <input wire:model="usuario" id="usuario" type="text" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('usuario') ring-2 ring-red-500 @enderror" required autofocus>
                             @error('usuario') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         @if(in_array($userRole, ['SUPERADMIN', 'ADMIN_SUC']))
                             <div>
                                 <label for="email" class="block font-semibold text-white mb-1">Email</label>
-                                <input wire:model.live="email" id="email" type="email" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('email') ring-2 ring-red-500 @enderror" required>
+                                <input wire:model="email" id="email" type="email" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('email') ring-2 ring-red-500 @enderror" required>
                                 @error('email') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
                         @endif
@@ -51,12 +51,12 @@
                         <form wire:submit.prevent="updatePassword" class="mt-6 space-y-4">
                             <div>
                                 <label for="password" class="block font-semibold text-white mb-1">Nueva Contraseña</label>
-                                <input wire:model.live="password" id="password" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
+                                <input wire:model="password" id="password" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
                                 @error('password') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label for="password_confirmation" class="block font-semibold text-white mb-1">Confirmar Contraseña</label>
-                                <input wire:model.live="password_confirmation" id="password_confirmation" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
+                                <input wire:model="password_confirmation" id="password_confirmation" type="password" class="w-full px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-mostaza @error('password') ring-2 ring-red-500 @enderror" required>
                             </div>
                             <div class="flex items-center gap-4 pt-2">
                                 <button type="submit" class="bg-terracota text-white font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors">
@@ -88,6 +88,7 @@
             <div
                 class="p-4 rounded-lg shadow-lg text-white font-semibold flex items-center
                        {{ $notification['type'] === 'success' ? 'bg-green-500' : 'bg-red-500' }}"
+
             >
                 @if ($notification['type'] === 'success')
                     <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
