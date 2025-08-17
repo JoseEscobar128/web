@@ -93,3 +93,59 @@ Route::get('/debug-url', function () {
     echo "URL generada por url('/'): " . url('/') . "<br>";
     echo "URL generada por asset('js/app.js'): " . asset('js/app.js');
 });
+
+// Pega esto al final de tu archivo routes/web.php
+
+Route::get('/diagnostico-completo', function () {
+    // Desactivamos el límite de tiempo de ejecución para esta ruta por si acaso
+    set_time_limit(0);
+    
+    echo '<style>body { font-family: sans-serif; background: #f8f9fa; padding: 2em; } h1, h2 { color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 5px; } pre { background: #fff; border: 1px solid #ced4da; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }</style>';
+    echo '<h1>Diagnóstico Completo de la Aplicación</h1>';
+
+    // --- SECCIÓN 1: ¿QUÉ LE DICE NGINX A PHP? ---
+    echo '<h2>1. Información del Servidor (Vista de Nginx/PHP)</h2>';
+    echo '<p>Estos son los datos crudos que PHP recibe del servidor. Claves como <code>HTTPS</code> y <code>HTTP_X_FORWARDED_PROTO</code> nos dicen si Nginx está comunicando que la conexión es segura. <code>SCRIPT_FILENAME</code> es crucial para saber si la ruta a tus archivos es correcta.</p>';
+    echo '<pre>';
+    print_r([
+        'HTTPS'             => $_SERVER['HTTPS'] ?? 'NO PRESENTE',
+        'X-Forwarded-Proto' => $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? 'NO PRESENTE',
+        'SERVER_PORT'       => $_SERVER['SERVER_PORT'] ?? 'N/A',
+        'REQUEST_URI'       => $_SERVER['REQUEST_URI'] ?? 'N/A',
+        'SCRIPT_FILENAME'   => $_SERVER['SCRIPT_FILENAME'] ?? 'N/A',
+        'DOCUMENT_ROOT'     => $_SERVER['DOCUMENT_ROOT'] ?? 'N/A',
+    ]);
+    echo '</pre>';
+    echo '<hr>';
+
+    // --- SECCIÓN 2: ¿QUÉ INTERPRETA LARAVEL? ---
+    echo '<h2>2. Información de la Petición (Vista de Laravel)</h2>';
+    echo '<p>Así es como Laravel interpreta la información anterior. <code>isSecure()</code> debe ser <code>true</code>. Las URLs generadas por <code>url()</code> y <code>asset()</code> deben empezar con <code>https://</code>.</p>';
+    echo '<pre>';
+    print_r([
+        'request()->isSecure()' => request()->isSecure() ? 'Sí (true)' : 'No (false)',
+        'url()->current()'      => url()->current(),
+        'asset("test.js")'      => asset('test.js'),
+    ]);
+    echo '</pre>';
+    echo '<hr>';
+
+    // --- SECCIÓN 3: ¿EL USUARIO TIENE SESIÓN? ---
+    echo '<h2>3. Estado de Autenticación</h2>';
+    echo '<p>Esto nos dice si, según Laravel, el usuario tiene una sesión activa. <code>auth()->check()</code> debe ser <code>true</code> después de iniciar sesión.</p>';
+    echo '<pre>';
+    print_r([
+        'auth()->check()' => auth()->check() ? 'Sí (true)' : 'No (false)',
+        'auth()->id()'    => auth()->id(),
+        'auth()->user()'  => auth()->user() ? auth()->user()->toArray() : 'Nadie (null)',
+    ]);
+    echo '</pre>';
+    echo '<hr>';
+
+    // --- SECCIÓN 4: ¿QUÉ HAY EN LA SESIÓN? ---
+    echo '<h2>4. Datos de la Sesión Actual</h2>';
+    echo '<p>Aquí vemos todo lo que está guardado en la sesión actual. Después del login, deberíamos ver aquí el <code>access_token</code> y las claves de autenticación de Laravel.</p>';
+    echo '<pre>';
+    print_r(session()->all());
+    echo '</pre>';
+});
