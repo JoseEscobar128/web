@@ -54,6 +54,11 @@ class ProfilePage extends Component
         $response = Http::authApi()->get('/me');
 
         if ($response->failed()) {
+            dd([
+                'status' => $response->status(),
+                'body'   => $response->body(),
+                'headers' => $response->headers(),
+            ]);
             return redirect()->route('home')->with('error', 'No se pudo obtener la información del usuario.');
         }
 
@@ -67,6 +72,7 @@ class ProfilePage extends Component
         // También actualizar la sesión si quieres usarla en otras partes
         session(['user' => (object) $userData]);
     }
+
 
 
     /**
