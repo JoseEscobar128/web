@@ -96,11 +96,12 @@ Route::get('/debug-url', function () {
 
 // Pega esto al final de tu archivo routes/web.php
 
+
 Route::get('/diagnostico-completo', function () {
     // Desactivamos el límite de tiempo de ejecución para esta ruta por si acaso
     set_time_limit(0);
     
-    echo '<style>body { font-family: sans-serif; background: #f8f9fa; padding: 2em; } h1, h2 { color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 5px; } pre { background: #fff; border: 1px solid #ced4da; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }</style>';
+    echo '<style>body { font-family: sans-serif; background: #f8f9fa; padding: 2em; } h1, h2 { color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 5px; } pre { background: #fff; border: 1px solid #ced4da; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; } code { background: #e9ecef; padding: 2px 4px; border-radius: 3px; }</style>';
     echo '<h1>Diagnóstico Completo de la Aplicación</h1>';
 
     // --- SECCIÓN 1: ¿QUÉ LE DICE NGINX A PHP? ---
@@ -148,4 +149,21 @@ Route::get('/diagnostico-completo', function () {
     echo '<pre>';
     print_r(session()->all());
     echo '</pre>';
+    echo '<hr>';
+
+    // --- NUEVA SECCIÓN 5: ¿QUÉ CONFIGURACIÓN TIENE LIVEWIRE? ---
+    echo '<h2>5. Diagnóstico de Livewire</h2>';
+    echo '<p>Estos son los valores de configuración que Livewire está usando. La clave <code>app_url</code> es la que usa para generar la URL de su script dinámico (la que te da el error de Mixed Content). Si esta URL empieza con <code>http://</code>, hemos encontrado al culpable.</p>';
+    
+    // Verificamos si el archivo de configuración de Livewire existe antes de intentar leerlo.
+    if (config()->has('livewire')) {
+        echo '<pre>';
+        print_r([
+            'config("livewire.app_url")'   => config('livewire.app_url'),
+            'config("livewire.asset_url")' => config('livewire.asset_url'),
+        ]);
+        echo '</pre>';
+    } else {
+        echo '<p><strong>Advertencia:</strong> El archivo <code>config/livewire.php</code> no parece estar publicado o cargado. Livewire podría estar usando valores por defecto.</p>';
+    }
 });
