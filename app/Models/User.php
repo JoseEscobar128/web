@@ -9,17 +9,24 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
-        'api_id', 'name', 'last_name', 'email', 'token'
+        'api_id',
+        'name',
+        'last_name',
+        'email',
+        'password', // <-- AÑADIDO
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     */
     protected $hidden = [
-        'token',
+        'password', // <-- AÑADIDO (para seguridad)
+        'remember_token',
     ];
 
-    // Opcional: para usar como identificador en las rutas si lo necesitas
-    public function getRouteKeyName()
-    {
-        return 'api_id';
-    }
+    // ... (tu método getRouteKeyName() se queda igual)
 }

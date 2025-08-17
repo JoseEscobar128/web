@@ -6,25 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id(); // ID local
-            $table->unsignedBigInteger('api_id')->unique(); // ID real en la API
+            $table->id();
+            $table->unsignedBigInteger('api_id')->unique();
             $table->string('name', 50);
-            $table->string('last_name', 50)->nullable(); // si lo ocupas
+            $table->string('last_name', 50)->nullable();
             $table->string('email')->unique();
-            $table->string('token')->nullable(); // token devuelto por la API
+            
+            // --- CAMBIO IMPORTANTE ---
+            // Añadimos la columna 'password'. Es un requisito técnico de Laravel,
+            // aunque la llenemos con un valor aleatorio.
+            $table->string('password'); 
+
+            $table->rememberToken(); // Buena práctica añadir esto también.
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');
