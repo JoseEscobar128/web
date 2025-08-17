@@ -51,7 +51,7 @@ class ProfilePage extends Component
         }
 
         // Consumir la API para obtener los datos del usuario autenticado
-        $response = Http::authApi()->get('/me');
+        $response = Http::authApi()->get('/usuarios/me');
 
         if ($response->failed()) {
             dd([
