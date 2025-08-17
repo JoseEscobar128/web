@@ -161,23 +161,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | App URL
-    |--------------------------------------------------------------------------
-    |
-    | Define la URL absoluta de tu aplicación. Es crucial para generar las
-    | URLs internas de Livewire correctamente, especialmente detrás de un proxy
-    | o en una configuración de subdirectorio.
-    |
-    */
-    'app_url' => env('APP_URL'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Asset URL
     |--------------------------------------------------------------------------
     | Define la URL base desde donde se deben cargar los assets de Livewire.
-    |
     */
-    'asset_url' => env('ASSET_URL'),
+    'asset_url' => env('ASSET_URL', env('APP_URL') . '/web'),
 
 ];
