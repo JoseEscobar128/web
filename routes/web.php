@@ -45,7 +45,7 @@ Route::middleware('web')->group(function () {
 
 
     // Grupo de rutas protegidas que requieren un token de sesión
-    Route::middleware('auth.token')->group(function () {
+    Route::middleware('auth')->group(function () {
         
         // Rutas del Dashboard
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
