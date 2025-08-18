@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 // --- IMPORTACIONES PARA FORZAR LA CONEXIÓN DE LIVEWIRE ---
 use Livewire\Livewire;
 use App\Http\Livewire\Auth\Login;
+use Devrabiul\LivewireDoctor\LivewireDoctor;
 use App\Http\Livewire\Auth\VerifyOtp;
 use Illuminate\Support\Facades\URL; // <-- Agregado
 
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         // Esto le dice a Laravel exactamente dónde encontrar la lógica para cada vista.
         Livewire::component('auth.login', Login::class);
         Livewire::component('auth.verify-otp', VerifyOtp::class);
+	LivewireDoctor::initCustomAsset();
 
         // --- FORZAR HTTPS EN PRODUCCIÓN ---
         if (config('app.env') === 'production') {

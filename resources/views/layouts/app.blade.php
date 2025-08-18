@@ -10,6 +10,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     </head>
     <body class="font-sans antialiased">
         <div class="h-screen flex bg-mostaza overflow-hidden">
@@ -24,6 +25,11 @@
                 </main>
             </div>
         </div>
-        @livewireScripts
+
+//<script src="https://cdn.jsdelivr.net/gh/livewire/livewire/dist/livewire.min.js"></script>
+	<script src="https://pagina-prueba.com/web/vendor/livewire/livewire.js"></script>
+        @livewireScripts        
+
+
     </body>
 </html>
