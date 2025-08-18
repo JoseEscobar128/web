@@ -20,16 +20,8 @@
                         {{-- Mostrar imagen (Lógica corregida) --}}
                         @if ($new_image)
                             <img src="{{ $new_image->temporaryUrl() }}" class="w-full h-48 object-cover rounded-lg shadow-md">
-                        
-                        {{-- ========================================================== --}}
-                        {{-- ===== INICIO DEL BLOQUE DE CÓDIGO MODIFICADO ============= --}}
-                        {{-- ========================================================== --}}
-                        @elseif (is_array($imagen_principal) && !empty($imagen_principal[0]))
-                            <img src="{{ Storage::url('images/' . $imagen_principal[0]) }}" class="w-full h-48 object-cover rounded-lg shadow-md">
-                        {{-- ========================================================== --}}
-                        {{-- ===== FIN DEL BLOQUE DE CÓDIGO MODIFICADO ================ --}}
-                        {{-- ========================================================== --}}
-
+                        @elseif (!empty($imagen_principal[0]))
+    			<img src="{{ asset('storage/images/' . $imagen_principal[0]) }}" class="w-full h-48 object-cover rounded-lg shadow-md">
                         @else
                             <div class="w-full h-48 bg-gray-700/50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-400">
                                 <span class="text-sm text-gray-300">Sin imagen</span>
@@ -111,6 +103,7 @@
             <div
                 class="p-4 rounded-lg shadow-lg text-white font-semibold flex items-center
                        {{ $notification['type'] === 'success' ? 'bg-green-500' : 'bg-red-500' }}"
+
             >
                 @if ($notification['type'] === 'success')
                     <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>

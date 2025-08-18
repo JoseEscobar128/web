@@ -10,16 +10,16 @@
                  style="max-height: calc(100vh - 140px);">
                 @foreach ($products as $product)
                     <div class="bg-white rounded-lg shadow p-2 flex flex-col">
-                        
+
                         {{-- ========================================================== --}}
                         {{-- ===== INICIO DE LA CORRECCIÓN DE IMAGEN ================== --}}
                         {{-- ========================================================== --}}
                         @php
-                            // Lógica para determinar la URL de la imagen del producto
-                            $imageUrl = 'https://placehold.co/150x150/F5BB20/FFFFFF?text=Imagen'; // Placeholder por defecto
-                            if (isset($product['imagen_principal']) && is_array($product['imagen_principal']) && !empty($product['imagen_principal'][0])) {
-                                $filename = $product['imagen_principal'][0];
-                                $imageUrl = Storage::url('images/' . $filename);
+                            // Imagen por defecto
+                            $imageUrl = 'https://placehold.co/150x150/F5BB20/FFFFFF?text=Imagen';
+                            // Si existe imagen principal, usar storage público
+                            if (!empty($product['imagen_principal'][0])) {
+                                $imageUrl = asset('storage/images/' . $product['imagen_principal'][0]);
                             }
                         @endphp
 

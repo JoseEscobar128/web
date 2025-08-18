@@ -32,8 +32,8 @@ class AppServiceProvider extends ServiceProvider
 	LivewireDoctor::initCustomAsset();
 
         // --- FORZAR HTTPS EN PRODUCCIÓN ---
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
+        //if (config('app.env') === 'production') {
+        //    URL::forceScheme('https');
+        //}
     }
 }

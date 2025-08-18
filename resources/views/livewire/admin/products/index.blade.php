@@ -62,26 +62,17 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
-                                        
-                                        {{-- ========================================================== --}}
-                                        {{-- ===== INICIO DE LA CORRECCIÓN DE IMAGEN ================== --}}
-                                        {{-- ========================================================== --}}
                                         @php
-                                            // Lógica para determinar la URL de la imagen
-                                            $imageUrl = 'https://placehold.co/40x40/f9f9f9/333333?text=?'; // Placeholder por defecto
-                                            if (isset($product['imagen_principal']) && is_array($product['imagen_principal']) && !empty($product['imagen_principal'][0])) {
-                                                $filename = $product['imagen_principal'][0];
-                                                $imageUrl = Storage::url('images/' . $filename);
+                                            // Imagen por defecto
+                                            $imageUrl = 'https://placehold.co/40x40/f9f9f9/333333?text=?';
+                                            // Si existe imagen principal, usar storage público
+                                            if (!empty($product['imagen_principal'][0])) {
+                                                $imageUrl = asset('storage/images/' . $product['imagen_principal'][0]);
                                             }
                                         @endphp
-
                                         <img class="h-10 w-10 rounded-full object-cover"
                                              src="{{ $imageUrl }}"
                                              alt="{{ $product['nombre'] }}">
-                                        {{-- ========================================================== --}}
-                                        {{-- ===== FIN DE LA CORRECCIÓN DE IMAGEN ===================== --}}
-                                        {{-- ========================================================== --}}
-
                                         <div class="ml-4 text-sm font-medium text-gray-900">{{ $product['nombre'] }}</div>
                                     </div>
                                 </td>

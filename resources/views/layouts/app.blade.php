@@ -25,11 +25,6 @@
                 </main>
             </div>
         </div>
-
-//<script src="https://cdn.jsdelivr.net/gh/livewire/livewire/dist/livewire.min.js"></script>
 	<script src="https://pagina-prueba.com/web/vendor/livewire/livewire.js"></script>
-        @livewireScripts        
-
-
     </body>
 </html>
