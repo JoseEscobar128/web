@@ -30,8 +30,8 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('auth.verify-otp', VerifyOtp::class);
 
         // --- FORZAR HTTPS EN PRODUCCIÓN ---
-        //if (config('app.env') === 'production') {
-        //    URL::forceScheme('https');
-        //}
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }
