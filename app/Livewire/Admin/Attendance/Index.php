@@ -52,6 +52,14 @@ class Index extends Component
 
         $response = Http::authApi()->get('/asistencias', $query);
 
+        // Debug: ver toda la respuesta de la API
+        dd([
+            'status' => $response->status(),
+            'body' => $response->body(),
+            'json' => $response->json(),
+            'query_sent' => $query,
+        ]);
+
         if ($response->successful()) {
             $data = $response->json();
             $this->asistencias = $data['data'] ?? [];
@@ -64,6 +72,7 @@ class Index extends Component
             session()->flash('error', 'No se pudo cargar la lista de asistencias.');
         }
     }
+
 
     public function goToPage($page)
     {
