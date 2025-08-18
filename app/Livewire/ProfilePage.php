@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ProfilePage extends Component
@@ -13,26 +14,20 @@ class ProfilePage extends Component
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
-
-    // Propiedad para la notificación
     public ?array $notification = null;
 
     /**
-     * Define las reglas de validación para todos los campos del componente.
+     * Reglas de validación
      */
     protected function rules()
     {
         return [
             'usuario' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            // La contraseña es opcional, pero si se escribe, debe cumplir las reglas.
             'password' => 'nullable|min:8|confirmed',
         ];
     }
 
-    /**
-     * Define los mensajes de error personalizados.
-     */
     protected function messages()
     {
         return [
@@ -44,35 +39,36 @@ class ProfilePage extends Component
         ];
     }
 
+    /**
+     * Se ejecuta al inicializar el componente
+     */
     public function mount()
     {
+        Log::info('Livewire mount: URL actual -> ' . url()->current());
+
         if (!session()->has('access_token')) {
+            Log::warning('No hay access_token en sesión. Redirigiendo...');
             return redirect()->route('home')->with('error', 'Tu sesión ha expirado.');
         }
 
         $response = Http::authApi()->get('/usuarios/me');
+        Log::info('Respuesta API /usuarios/me', ['status' => $response->status(), 'body' => $response->body()]);
 
         if ($response->failed()) {
+            Log::error('Fallo al obtener info de usuario', ['status' => $response->status()]);
             return redirect()->route('home')->with('error', 'No se pudo obtener la información del usuario.');
         }
 
-        // 👇 aquí extraes el objeto de usuario
         $userData = $response->json('data');
+        Log::info('Datos de usuario cargados', ['userData' => $userData]);
 
-        // Guardar en propiedades
         $this->userId  = $userData['id'];
         $this->usuario = $userData['usuario'];
         $this->email   = $userData['email'];
 
-        // También actualizar la sesión si quieres usarla en otras partes
         session(['user' => (object) $userData]);
     }
 
-
-
-    /**
-     * Valida en tiempo real cuando una propiedad cambia.
-     */
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);
@@ -81,20 +77,21 @@ class ProfilePage extends Component
     public function updateProfileInformation()
     {
         try {
-            // Validamos solo los campos de este formulario
             $this->validate([
                 'usuario' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
             ]);
         } catch (ValidationException $e) {
             $this->showNotification(array_values($e->errors())[0][0], 'error');
+            Log::warning('Validación fallida updateProfileInformation', ['errors' => $e->errors()]);
             throw $e;
         }
 
-        $response = Http::authApi()->put("/usuarios/{$this->userId}", [
-            'usuario' => $this->usuario,
-            'email' => $this->email,
-        ]);
+        $payload = ['usuario' => $this->usuario, 'email' => $this->email];
+        Log::info('Intentando actualizar perfil', ['userId' => $this->userId, 'payload' => $payload]);
+
+        $response = Http::authApi()->put("/usuarios/{$this->userId}", $payload);
+        Log::info('Respuesta API updateProfileInformation', ['status' => $response->status(), 'body' => $response->body()]);
 
         if ($response->successful()) {
             $user = session('user');
@@ -110,18 +107,17 @@ class ProfilePage extends Component
     public function updatePassword()
     {
         try {
-            // Validamos solo los campos de este formulario
-            $this->validate([
-                'password' => 'required|min:8|confirmed',
-            ]);
+            $this->validate(['password' => 'required|min:8|confirmed']);
         } catch (ValidationException $e) {
             $this->showNotification(array_values($e->errors())[0][0], 'error');
+            Log::warning('Validación fallida updatePassword', ['errors' => $e->errors()]);
             throw $e;
         }
 
-        $response = Http::authApi()->put("/usuarios/{$this->userId}", [
-            'contrasena' => $this->password,
-        ]);
+        Log::info('Intentando actualizar contraseña para userId: ' . $this->userId);
+
+        $response = Http::authApi()->put("/usuarios/{$this->userId}", ['contrasena' => $this->password]);
+        Log::info('Respuesta API updatePassword', ['status' => $response->status(), 'body' => $response->body()]);
 
         if ($response->successful()) {
             $this->showNotification('Contraseña actualizada correctamente.', 'success');
@@ -133,9 +129,10 @@ class ProfilePage extends Component
 
     public function showNotification(string $message, string $type = 'success')
     {
+        Log::info('Notificación', ['type' => $type, 'message' => $message]);
         $this->notification = ['message' => $message, 'type' => $type];
     }
-    
+
     public function resetNotification()
     {
         $this->notification = null;
@@ -143,6 +140,7 @@ class ProfilePage extends Component
 
     public function render()
     {
+        Log::info('Renderizando componente Livewire profile-page');
         return view('livewire.profile-page')->layout('layouts.app');
     }
 }
