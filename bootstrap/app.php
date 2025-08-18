@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
+          return [
+            \App\Http\Middleware\ForceHttpsAndFixMixedContent::class,
+        ];
 
     //$middleware->alias([
     //    'auth.token' => \App\Http\Middleware\CheckTokenSession::class,
